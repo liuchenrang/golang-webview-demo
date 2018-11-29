@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js?"></script>
+    <script type="text/javascript" src="http://localhost:8080/static/jquery.jsonrpc.js"></script>
+
+    <script>
+       /* */
+
+        function xz() {
+           call("MyPageAction.Add",[1],function (data) {
+               $("h1").text(data)
+           });
+        }
+    </script>
+</head>
+<body>
+<h1 >page1</h1>
+
+<button onclick="xz()">click</button>
+</body>
+
+</html>
