@@ -1,4 +1,4 @@
-package main
+package lib
 
 import (
 	"fmt"
@@ -8,7 +8,6 @@ import (
 	"net/rpc"
 	"net/rpc/jsonrpc"
 )
-
 
 var rpcServer *rpc.Server
 
@@ -41,6 +40,5 @@ func startRPCHandler() {
 
 		}))
 	}()
-
 
 }

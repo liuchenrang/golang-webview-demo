@@ -1,39 +1,31 @@
-package main
+package lib
 
 import (
 	"errors"
 	"fmt"
-	"github.com/zserge/webview"
 	"sync"
+
+	"github.com/webview/webview"
 )
 
 var lock = sync.RWMutex{}
 var c = make(chan string, 1)
 
-
 type Window struct {
 	WebView webview.WebView
-	pages []*Pager
+	pages   []*Pager
 }
 
-
-func StartWindow(title string, w, h int, resize bool,f func())  {
-	if window!=nil{
+func StartWindow(title string, w, h int, resize bool, f func()) {
+	if window != nil {
 		panic(errors.New("window exist!"))
 	}
 	startRPCHandler()
 	startHttpHandler()
-	w1 := webview.New(webview.Settings{
-		Width:     w,
-		Height:    h,
-		Title:     title,
-		Resizable: resize,
-		Debug:     false,
-
-	})
-
-	window= &Window{w1,make([]*Pager,0)}
-
+	w1 := webview.New(false)
+	defer w1.Destroy()
+	w1.SetSize(800, 600, webview.HintNone)
+	window = &Window{w1, make([]*Pager, 0)}
 
 	go func() {
 		for {
@@ -47,10 +39,9 @@ func StartWindow(title string, w, h int, resize bool,f func())  {
 	}()
 	go f()
 	window.WebView.Run()
-	window.WebView.Exit()
+	//window.WebView.Destroy()
 	server.Shutdown(nil)
 }
-
 
 func (w *Window) open(s string) {
 	c <- fmt.Sprintf(`window.open("http://localhost:8080/%s", "_self")`, s)
@@ -59,25 +50,23 @@ func (w *Window) CallFunc(s string) {
 	c <- s
 }
 func (w *Window) Backup() {
-	fmt.Println("back1",len(w.pages))
+	fmt.Println("back1", len(w.pages))
 	lock.Lock()
 	defer lock.Unlock()
-	if len(w.pages)<=1{
-		w.pages=w.pages[0:0]
+	if len(w.pages) <= 1 {
+		w.pages = w.pages[0:0]
 		window.WebView.Terminate()
-	}else{
+	} else {
 		fmt.Println("back")
-		pre:=w.pages[len(w.pages)-1]
+		pre := w.pages[len(w.pages)-1]
 
 		pre.StopPage()
 		pre.page.Close()
 
-		p:=w.pages[len(w.pages)-2]
+		p := w.pages[len(w.pages)-2]
 		w.pages = w.pages[:len(w.pages)-2]
 
-
 		p.page.getWindow().addPage(p)
-
 
 		p.page.Start()
 
@@ -87,5 +76,5 @@ func (w *Window) Backup() {
 	}
 }
 func (w *Window) addPage(p *Pager) {
-	w.pages  =append(w.pages,p)
+	w.pages = append(w.pages, p)
 }

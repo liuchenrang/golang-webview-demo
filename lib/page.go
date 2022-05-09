@@ -1,8 +1,9 @@
-package main
+package lib
 
 import (
 	"fmt"
 	"reflect"
+	"sync"
 )
 
 type Page interface {
@@ -75,6 +76,7 @@ func (p *PageImpl) setPageName(s string) {
 }
 
 type Pager struct {
+	lock sync.Mutex
 	page Page
 }
 
@@ -105,5 +107,5 @@ func NewPager(p Page, action interface{}) Pager {
 	name := reflect.TypeOf(p).String()
 	p.setPageImpl(action)
 	p.setPageName(name)
-	return Pager{p}
+	return Pager{lock:sync.Mutex{},page: p}
 }

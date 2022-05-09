@@ -1,4 +1,4 @@
-package main
+package lib
 
 import (
 	"fmt"
@@ -15,12 +15,12 @@ var HttpPort ="8080"
 var RPCPort="3333"
 func startHttpHandler(){
 
-	server=startHttpServer()
+	server = startHttpServer()
 }
 
 
 func startHttpServer() *http.Server {
-	srv := &http.Server{Addr: ":"+HttpPort}
+	srv := &http.Server{Addr: ":"+ HttpPort}
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		path:=r.URL.Path
 		if strings.HasPrefix(path,"/static/"){
@@ -32,7 +32,7 @@ func startHttpServer() *http.Server {
 			return
 		}
 		fmt.Println(path)
-		if pagePath:=pageMap[path];pagePath!=""{
+		if pagePath:= pageMap[path];pagePath!=""{
 			if b,e:=ioutil.ReadFile(pagePath);e==nil{
 				w.WriteHeader(200)
 				w.Write(b)
